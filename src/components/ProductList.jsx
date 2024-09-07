@@ -25,7 +25,6 @@ const ProductList = () => {
         console.log("API Response:", response.data);
 
         if (response.data && response.data.products) {
-          // Convert products object to an array with id
           const productsArray = Object.entries(response.data.products).map(
             ([id, product]) => ({ id, ...product })
           );
@@ -55,7 +54,8 @@ const ProductList = () => {
   if (loading) {
     return (
       <div className="container mx-auto p-4 text-center text-gray-500">
-        Loading...
+        <div className="animate-spin border-t-4 border-blue-500 border-solid h-12 w-12 rounded-full mx-auto"></div>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -107,25 +107,27 @@ const ProductList = () => {
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-4">Product List</h1>
+    <div className="container mx-auto p-6">
+      <div className="bg-[#f8fab9] shadow-lg rounded-lg p-8 mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-6">
+          Product List
+        </h1>
         <input
           type="text"
           placeholder="Search by title"
-          className="border border-gray-300 rounded-lg p-3 w-full mb-4"
+          className="border border-gray-300 rounded-lg p-4 w-full mb-6 text-gray-700 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={search}
           onChange={handleSearch}
         />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-gray-700">
               Price Range:
             </label>
             <select
               onChange={handlePriceRange}
               value={priceRange}
-              className="border border-gray-300 rounded-lg p-3 w-full"
+              className="border border-gray-300 rounded-lg p-4 w-full bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All</option>
               <option value="0-5000">0 - 5000</option>
@@ -135,13 +137,13 @@ const ProductList = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-gray-700">
               Popularity Range:
             </label>
             <select
               onChange={handlePopularityRange}
               value={popularityRange}
-              className="border border-gray-300 rounded-lg p-3 w-full"
+              className="border border-gray-300 rounded-lg p-4 w-full bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All</option>
               <option value="0-10000">0 - 10000</option>
@@ -151,11 +153,13 @@ const ProductList = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Sort by:</label>
+            <label className="block text-sm font-medium mb-2 text-gray-700">
+              Sort by:
+            </label>
             <select
               onChange={handleSort}
               value={sort}
-              className="border border-gray-300 rounded-lg p-3 w-full"
+              className="border border-gray-300 rounded-lg p-4 w-full bg-gray-50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="price-asc">Price (Low to High)</option>
               <option value="price-desc">Price (High to Low)</option>
@@ -167,46 +171,50 @@ const ProductList = () => {
         {filteredProducts.length === 0 && (
           <p className="text-center text-gray-500">No products found.</p>
         )}
-        {paginatedProducts.map((product) => (
-          <div
-            key={product.id} // Unique key for each product
-            className="border border-gray-200 rounded-lg shadow-md p-4 bg-white mb-4"
-          >
-            <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-            <p className="text-gray-700 mb-2">
-              Price: <span className="font-bold">${product.price}</span>
-            </p>
-            <p className="text-gray-700 mb-4">
-              Popularity:{" "}
-              <span className="font-bold">{product.popularity}</span>
-            </p>
-            {product.id ? (
-              <Link
-                to={generatePath("/product/:id", { id: product.id })}
-                className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
-              >
-                View Details
-              </Link>
-            ) : (
-              <p className="text-red-600">No ID available</p>
-            )}
-          </div>
-        ))}
-        <div className="flex justify-between items-center mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4  lg:grid-cols-4 gap-6 mb-6">
+          {paginatedProducts.map((product) => (
+            <div
+              key={product.id}
+              className="border border-gray-500 rounded-lg shadow-lg p-6 bg-[#fab9c8] transition-transform transform hover:scale-105 hover:shadow-xl"
+            >
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">
+                {product.title}
+              </h3>
+              <p className="text-gray-600 mb-2">
+                Price: <span className="font-bold">${product.price}</span>
+              </p>
+              <p className="text-gray-600 mb-4">
+                Popularity:{" "}
+                <span className="font-bold">{product.popularity}</span>
+              </p>
+              {product.id ? (
+                <Link
+                  to={generatePath("/product/:id", { id: product.id })}
+                  className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
+                >
+                  View Details
+                </Link>
+              ) : (
+                <p className="text-red-600">No ID available</p>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between items-center mt-6">
           <button
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
           >
             Previous
           </button>
-          <span>
+          <span className="text-gray-700">
             Page {page} of {totalPages}
           </span>
           <button
             onClick={() => handlePageChange(page + 1)}
             disabled={page === totalPages}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
           >
             Next
           </button>
