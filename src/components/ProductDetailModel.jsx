@@ -68,6 +68,7 @@ const ProductDetails = () => {
       <h1 className="text-2xl font-bold mb-4">{product.title}</h1>
       <p className="text-gray-700 mb-2">Price: ${product.price}</p>
       <p className="text-gray-700 mb-4">Popularity: {product.popularity}</p>
+      <p className="text-gray-700 mb-4">Description: </p>
       <Link
         to="/"
         className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
