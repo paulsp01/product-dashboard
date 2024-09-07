@@ -1,9 +1,7 @@
-// src/components/ProductList.jsx
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import { ProductContext } from "../context/ProductContext";
-//import ProductModal from "./ProductDetailModal";
+import { Link, generatePath } from "react-router-dom";
 
 const ProductList = () => {
   const { products, setProducts } = useContext(ProductContext);
@@ -26,16 +24,11 @@ const ProductList = () => {
         );
         console.log("API Response:", response.data);
 
-        // Check if the data has a products key with an array
-        if (response.data && Array.isArray(response.data.products)) {
-          setProducts(response.data.products);
-        } else if (
-          response.data &&
-          response.data.products &&
-          typeof response.data.products === "object"
-        ) {
-          // Handle cases where products is an object but not an array
-          const productsArray = Object.values(response.data.products);
+        if (response.data && response.data.products) {
+          // Convert products object to an array with id
+          const productsArray = Object.entries(response.data.products).map(
+            ([id, product]) => ({ id, ...product })
+          );
           setProducts(productsArray);
         } else {
           console.error("Unexpected data format:", response.data);
@@ -103,7 +96,7 @@ const ProductList = () => {
         case "popularity-desc":
           return b.popularity - a.popularity;
         default:
-          return 0; // Default return value in case of no matching sort option
+          return 0;
       }
     });
 
@@ -171,12 +164,13 @@ const ProductList = () => {
             </select>
           </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredProducts.length === 0 && (
+          <p className="text-center text-gray-500">No products found.</p>
+        )}
         {paginatedProducts.map((product) => (
           <div
             key={product.id} // Unique key for each product
-            className="border border-gray-200 rounded-lg shadow-md p-4 bg-white"
+            className="border border-gray-200 rounded-lg shadow-md p-4 bg-white mb-4"
           >
             <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
             <p className="text-gray-700 mb-2">
@@ -186,47 +180,37 @@ const ProductList = () => {
               Popularity:{" "}
               <span className="font-bold">{product.popularity}</span>
             </p>
-            <Link
-              to={`/product/${product.id}`}
-              className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
-            >
-              View Details
-            </Link>
+            {product.id ? (
+              <Link
+                to={generatePath("/product/:id", { id: product.id })}
+                className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
+              >
+                View Details
+              </Link>
+            ) : (
+              <p className="text-red-600">No ID available</p>
+            )}
           </div>
         ))}
-      </div>
-      <div className="mt-6 flex justify-between items-center">
-        <button
-          onClick={() => handlePageChange(1)}
-          disabled={page === 1}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          First
-        </button>
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <span className="text-sm">
-          Page {page} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === totalPages}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          Next
-        </button>
-        <button
-          onClick={() => handlePageChange(totalPages)}
-          disabled={page === totalPages}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          Last
-        </button>
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Previous
+          </button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === totalPages}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
